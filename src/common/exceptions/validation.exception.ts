@@ -5,4 +5,7 @@ export class ValidationException extends HttpException {
     constructor(errors: any) {
         super({ success: false, code: ErrorCodes.ERR_VALIDATION, errors }, HttpStatus.BAD_REQUEST);
     }
+    getResponse(): string | object {
+        return super.getResponse();
+    }
 }

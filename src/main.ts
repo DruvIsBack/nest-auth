@@ -7,6 +7,15 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+  app.use((req, res, next) => {
+    const hostname = req.hostname;
+    if (hostname === 'sample.com') {
+      // use SampleModule
+    } else if (hostname === 'contact.sample.com') {
+      // use SampleContactModule
+    }
+    next();
+  });
   await app.listen(3000);
   const server = app.getHttpServer();
   const router = server._events.request._router;
