@@ -4,20 +4,26 @@ import {UserEntity} from "../entities/user.entity";
 import {ValidationException} from "../../../common/exceptions/validation.exception";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import {hash as bcrypt_hash, compare as bcrypt_compare} from 'bcryptjs';
+import {compare as bcrypt_compare, hash as bcrypt_hash} from 'bcryptjs';
 import {SaltsEnums} from "../../../common/constants/salts.enums";
+import {RoleService} from "./role.service";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(UserEntity)
         private usersRepository: Repository<UserEntity>,
+        private roleService: RoleService
     ) {}
 
     async insert(userDetails: CreateUserDto): Promise<Record<string, any>> {
         const userEntity: UserEntity = UserEntity.create();
         userEntity.email = userDetails.email;
         userEntity.username = userDetails.username;
+        const rolePromises = userDetails.roles.map(async (role: string) => {
+            return this.roleService.findByName(role);
+        });
+        userEntity.roles = await Promise.all(rolePromises);
         userEntity.password = await bcrypt_hash(userDetails.password, SaltsEnums.BCRYPT_SALT_LENGTH);
         await userEntity.save();
         return userEntity.toJSON();

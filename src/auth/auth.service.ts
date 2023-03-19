@@ -20,6 +20,7 @@ export class AuthService {
             email: userData.email,
             username: userData.username,
             password: userData.password,
+            roles: userData.roles
         }))
     }
     async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string|false> {
